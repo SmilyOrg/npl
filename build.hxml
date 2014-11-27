@@ -1,0 +1,6 @@
+-cp src
+-lib ansi
+-lib mcli
+-resource assets/default.png@default
+-resource assets/key.txt@key
+-main NPL
