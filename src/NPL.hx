@@ -30,6 +30,7 @@ enum Error {
  * npl (Now PLaying)
  * 
  * Grabs now playing data from last.fm and provides it via CLI output and as files on the file system.
+ * 
  * Default album art "Circular auriculars" is CC BY 3.0 by GraphBerry.
  * 
  * Usage: npl USER
@@ -235,12 +236,15 @@ class NPL extends CommandLine {
 		log('TRACK: $output');
 		if (track != null && track.image != "") {
 			var url = track.image.replace(" ", "+");
-			var wget = new Process("wget", [url, "-O", image]);
-			if (wget.exitCode() == 0) {
+			var h = new Http(url);
+			h.onData = function(data) {
+				File.saveBytes(image, Bytes.ofString(data));
 				log('IMAGE: $url');
-			} else {
-				error('Failed to wget image: $url');
 			}
+			h.onError = function(e) {
+				error('Failed to download image: $e: $url');
+			}
+			h.request(false);
 		} else {
 			var out = File.write(image);
 			out.writeBytes(imageDefaultBytes, 0, imageDefaultBytes.length);
